@@ -216,7 +216,6 @@ head(intervalSteps)
 3. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
 ```{r} 
-
 ggplot(intervalSteps, aes(x = interval, y = steps)) + geom_line(stat =
                                                                   "identity") + facet_wrap( ~ daytype, ncol = 1) +
                                                                   labs(x = "Interval", y = "Avg steps") 
