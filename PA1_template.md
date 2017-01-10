@@ -1,17 +1,6 @@
----
-title: "Devoir noté par les pairs : Course Project 1"
-output: 
-  html_document: 
-    keep_md: yes
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Devoir noté par les pairs : Course Project 1
 
 
-knitr::opts_chunk$set(fig.path="figures/")
-
-```
 ##Introdution
 It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the “quantified self” movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
 
@@ -34,17 +23,16 @@ File header is
 ###Loading the data
 
 1. Load libraries and settings
-```{r}
+
+```r
 library(stringr)
 library(ggplot2)
-
-
 ```
 
 2. Load the data from the Working Directory
 
-```{r}
 
+```r
 df <-
         read.table(
           'activity.csv',
@@ -55,14 +43,24 @@ df <-
         )
 ```
 3. Transform date column in a Date class
-```{r}
 
+```r
 df$date <- as.Date(df$date, format="%Y-%m-%d")
-
 ```
 4. Data sample
-```{r}
+
+```r
 head(df)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 
@@ -77,64 +75,103 @@ head(df)
 
 
 1. Aggregate Steps by day
-```{r}
+
+```r
 dailySteps<-aggregate(steps ~ date, data = df, FUN = sum,na.action=na.pass)
 ```
     
 2. Calculate and report the mean of the total number of steps taken per day
     
-```{r}    
+
+```r
 stepMeanNA <- mean(dailySteps$steps, na.rm = TRUE)
 stepMeanNA
 ```
 
+```
+## [1] 10766.19
+```
+
 3. Calculate and report the median of the total number of steps taken per day
-```{r} 
+
+```r
 stepMedianNA <- median(dailySteps$steps, na.rm = TRUE)
 stepMedianNA
 ```
+
+```
+## [1] 10765
+```
 4. Make a histogram of the total number of steps taken each day
 
-```{r} 
+
+```r
 #ggplot(dailySteps, aes(x = date, y = steps)) + geom_histogram()
 
 ggplot(dailySteps, aes(steps)) + geom_histogram(binwidth = 2000, na.rm = TRUE) + labs(title = "Total number of steps taken each day", x = "Total Steps Per Day", y = "Frequency")
-
 ```
+
+![](figures/unnamed-chunk-8-1.png)<!-- -->
 
 
 ##What is the average daily activity pattern?
 
 1. Compute the average number of steps taken by time intervale
-```{r}
+
+```r
 intervalSteps<-aggregate(steps ~ interval, data = df, FUN= function(z) mean(z, na.rm = TRUE) ,na.action=na.pass)
 
 head(intervalSteps)
 ```
 
+```
+##   interval     steps
+## 1        0 1.7169811
+## 2        5 0.3396226
+## 3       10 0.1320755
+## 4       15 0.1509434
+## 5       20 0.0754717
+## 6       25 2.0943396
+```
+
 2. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r} 
+
+```r
 ggplot(intervalSteps, aes(x = interval, y = steps)) + geom_line(stat =
 "identity") +
 labs(x = "Interval", y="Avg steps") 
 ```
 
+![](figures/unnamed-chunk-10-1.png)<!-- -->
+
 3. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r} 
+
+```r
 intervalSteps[which.max(intervalSteps$steps),]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 ##Imputing missing values
 
 **Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.**
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r}
+
+```r
 sum(!complete.cases(df))
 ```
+
+```
+## [1] 2304
+```
 2.  The devised strategy for filling in all of the missing values in the dataset will be to take the mean of a 5 minute interval. Hence, we will create a new dataset that is equal to the original dataset but with the missing data filled
-```{r}
+
+```r
 dfNotNa<-df
 
 for (i in which(!complete.cases(dfNotNa))) {dfNotNa[i,]$steps<-intervalSteps[intervalSteps$interval==dfNotNa[i,]$interval,]$steps}
@@ -144,52 +181,82 @@ for (i in which(!complete.cases(dfNotNa))) {dfNotNa[i,]$steps<-intervalSteps[int
     
     
 1. Aggregate Steps by day
-```{r}
+
+```r
 dailySteps<-aggregate(steps ~ date, data = dfNotNa, FUN = sum,na.action=na.pass)
 ```
     
 2. Calculate and report the mean of the total number of steps taken per day
     
-```{r}    
+
+```r
 stepMean <- mean(dailySteps$steps, na.rm = TRUE)
 stepMean
 ```
 
+```
+## [1] 10766.19
+```
+
 3. Calculate and report the median of the total number of steps taken per day
-```{r} 
+
+```r
 stepMedian <- median(dailySteps$steps, na.rm = TRUE)
 stepMedian
 ```
-4. Make a histogram of the total number of steps taken each day
-
-```{r} 
-
-ggplot(dailySteps, aes(steps)) + geom_histogram(binwidth = 2000, na.rm = TRUE) +
-  labs(title = "Total number of steps taken each day", x = "Total Steps Per Day", y = "Frequency")
-
-
 
 ```
+## [1] 10766.19
+```
+4. Make a histogram of the total number of steps taken each day
+
+
+```r
+ggplot(dailySteps, aes(steps)) + geom_histogram(binwidth = 2000, na.rm = TRUE) +
+  labs(title = "Total number of steps taken each day", x = "Total Steps Per Day", y = "Frequency")
+```
+
+![](figures/unnamed-chunk-17-1.png)<!-- -->
 
 ###What is the impact of imputing missing data on the estimates of the total daily number of steps?
 **as one can notice mean and median values changes slightely compared to uncleaned data set**
 
 Mean with NA
-```{r} 
+
+```r
 stepMeanNA
 ```
+
+```
+## [1] 10766.19
+```
 Mean without NA
-```{r} 
+
+```r
 stepMean
 ```
 
+```
+## [1] 10766.19
+```
+
 Median with NA
-```{r} 
+
+```r
 stepMedianNA
 ```
+
+```
+## [1] 10765
+```
 Median without NA
-```{r} 
+
+```r
 stepMedian
+```
+
+```
+## [1] 10766.19
 ```
 
 ##Are there differences in activity patterns between weekdays and weekends?
@@ -198,7 +265,8 @@ stepMedian
 
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day. I added a second variable with the name of the day for checking purpose
 
-```{r}
+
+```r
 dfNotNa<- cbind(dfNotNa, day = weekdays(dfNotNa$date))
 #weekdays() causes trouble if the locale is not set to English
 dfNotNa<- cbind(dfNotNa, daytype = ifelse(as.POSIXlt(df$date)$wday%in% c(0,6),"weekend","weekday"))
@@ -206,20 +274,44 @@ dfNotNa<- cbind(dfNotNa, daytype = ifelse(as.POSIXlt(df$date)$wday%in% c(0,6),"w
 head(dfNotNa)
 ```
 
+```
+##       steps       date interval   day daytype
+## 1 1.7169811 2012-10-01        0 Lundi weekday
+## 2 0.3396226 2012-10-01        5 Lundi weekday
+## 3 0.1320755 2012-10-01       10 Lundi weekday
+## 4 0.1509434 2012-10-01       15 Lundi weekday
+## 5 0.0754717 2012-10-01       20 Lundi weekday
+## 6 2.0943396 2012-10-01       25 Lundi weekday
+```
+
 2. Aggragate value by interval and day type
-```{r}
+
+```r
 intervalSteps<-aggregate(steps ~ interval+daytype, data = dfNotNa, mean ,na.action=na.pass)
 
 head(intervalSteps)
 ```
 
+```
+##   interval daytype      steps
+## 1        0 weekday 2.25115304
+## 2        5 weekday 0.44528302
+## 3       10 weekday 0.17316562
+## 4       15 weekday 0.19790356
+## 5       20 weekday 0.09895178
+## 6       25 weekday 1.59035639
+```
+
 3. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
-```{r} 
+
+```r
 ggplot(intervalSteps, aes(x = interval, y = steps)) + geom_line(stat =
                                                                   "identity") + facet_wrap( ~ daytype, ncol = 1) +
                                                                   labs(x = "Interval", y = "Avg steps") 
 ```
+
+![](figures/unnamed-chunk-24-1.png)<!-- -->
 
 <!--See the README file in the GitHub repository to see an example of what this plot should look like using simulated data. -->
 
